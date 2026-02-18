@@ -1,135 +1,135 @@
 import streamlit as st
 from datetime import date
 
-# --- CONFIGURACIÓN DE LA PÁGINA ---
-st.set_page_config(page_title="Validador Penal Fiscal", page_icon="⚖️")
+# --- CONFIGURACIÓN DE PÁGINA (Para que se vea bien en móviles) ---
+st.set_page_config(
+    page_title="Validador Penal",
+    page_icon="⚖️",
+    layout="centered" # Centrado se ve mejor en celular que "wide"
+)
 
 def app():
-    # --- ENCABEZADO Y CRÉDITOS ---
-    st.markdown("---")
-    st.title("⚖️ VALIDADOR DE DELITOS FISCALES")
-    st.markdown("### OMISIÓN DE ACTIVOS (434A) Y EVASIÓN (434B)")
+    # --- TÍTULO COMPACTO ---
+    st.title("⚖️ VALIDADOR FISCAL")
+    st.markdown("**Omisión de Activos (434A) y Evasión (434B)**")
     
-    st.info(
-        """
-        **DESARROLLADO POR:**
-        * **Autor y Concepto Jurídico:** Dickson Hernando Medina Mateus
-        * **Co-piloto Tecnológico:** Gemini AI
-        * **Alcance:** Verificación de Umbrales (SMLMV) y Requisito de Procedibilidad.
-        """
-    )
-    st.markdown("---")
+    # Créditos en un desplegable pequeño para no estorbar
+    with st.expander("ℹ️ Créditos y Autoría"):
+        st.markdown(
+            """
+            * **Concepto Jurídico:** Dickson Hernando Medina Mateus
+            * **Tecnología:** Gemini AI
+            * **Base Legal:** Leyes 1819, 2010 y 2277.
+            """
+        )
 
-    # --- BASE DE DATOS: HISTÓRICO SMLMV ---
+    # --- BASE DE DATOS SMLMV ---
     smlmv_db = {
-        2017: 737717,
-        2018: 781242,
-        2019: 828116,
-        2020: 877803,
-        2021: 908526,
-        2022: 1000000,
-        2023: 1160000,
-        2024: 1300000,
-        2025: 1423500, 
-        2026: 1565850 
+        2017: 737717, 2018: 781242, 2019: 828116, 2020: 877803,
+        2021: 908526, 2022: 1000000, 2023: 1160000, 2024: 1300000,
+        2025: 1423500, 2026: 1565850
     }
 
-    # --- ENTRADAS (SIDEBAR) ---
-    st.sidebar.header("1. Datos del Caso")
+    # --- ENTRADAS EN EL CUERPO PRINCIPAL (NO SIDEBAR) ---
+    # Usamos un contenedor con borde para que parezca un formulario
+    st.markdown("---")
+    st.subheader("1. Ingresa los Datos")
     
-    # 1. FECHA
-    fecha_hechos = st.sidebar.date_input(
-        "Fecha de presentación de la declaración o hechos",
-        min_value=date(2017, 1, 1),
-        max_value=date(2026, 12, 31),
-        value=date(2024, 1, 1)
-    )
+    # FECHA
+    col_fecha, col_anio = st.columns([2, 1])
+    with col_fecha:
+        fecha_hechos = st.date_input(
+            "Fecha de hechos",
+            min_value=date(2017, 1, 1),
+            max_value=date(2026, 12, 31),
+            value=date(2024, 1, 1)
+        )
+    
     anio = fecha_hechos.year
     smlmv_anio = smlmv_db.get(anio, 1300000)
     
-    st.sidebar.markdown(f"**Año Fiscal:** {anio} | **SMLMV:** ${smlmv_anio:,.0f}")
+    with col_anio:
+        st.info(f"**Año:** {anio}")
 
-    # 2. TIPO PENAL
-    tipo_delito = st.sidebar.radio(
-        "¿Qué conducta se investiga?",
-        options=["Art. 434A (Activos/Pasivos)", "Art. 434B (Defraudación/Evasión)"]
+    # CONDUCTA (Radio button horizontal es más fácil de tocar en celular)
+    tipo_delito = st.radio(
+        "Conducta investigada:",
+        options=["Art. 434A (Activos)", "Art. 434B (Evasión)"],
+        horizontal=True
     )
 
-    # 3. VALOR
-    monto_irregularidad = st.sidebar.number_input(
-        "Valor de la irregularidad (Pesos COP)",
+    # VALOR Y ESTADO
+    monto_irregularidad = st.number_input(
+        "💰 Valor de la irregularidad (COP):",
         min_value=0.0,
-        format="%.2f"
+        format="%.0f",
+        help="Escribe el valor sin puntos ni comas"
     )
 
-    # 4. ESTADO PROCESAL
-    st.sidebar.header("2. Estado Procesal")
-    tiene_liquidacion = st.sidebar.radio(
-        "¿Existe Liquidación Oficial o Resolución Sanción?",
-        options=["NO (Etapa Persuasiva/Fiscalización)", "SÍ (Acto Administrativo Oficial)"]
+    tiene_liquidacion = st.checkbox(
+        "✅ ¿Ya existe Liquidación Oficial DIAN?",
+        help="Marca esta casilla SOLO si ya hay un acto administrativo oficial."
     )
 
-    # --- BOTÓN DE ANÁLISIS ---
-    if st.button("ANALIZAR CASO AHORA", type="primary"):
+    # --- BOTÓN GRANDE Y LLAMATIVO ---
+    if st.button("🔍 ANALIZAR AHORA", type="primary", use_container_width=True):
         
-        # FILTRO DE PROCEDIBILIDAD
-        if "NO" in tiene_liquidacion:
-            st.warning("⚠️ **ANÁLISIS DE PROCEDIBILIDAD: DETENIDO**")
-            st.markdown(f"""
-            Aunque exista una irregularidad de **${monto_irregularidad:,.0f}**, **NO se configura el delito procesalmente**.
-            
-            **Razón Jurídica:** El tipo penal exige que exista una **Liquidación Oficial** de la autoridad tributaria.
-            """)
-            st.success("✅ **CONCLUSIÓN:** El contribuyente está a tiempo de corregir en etapa administrativa sin riesgo penal inmediato.")
+        st.markdown("---")
+        st.subheader("📊 Resultados")
+
+        # 1. FILTRO PROCEDIBILIDAD
+        if not tiene_liquidacion:
+            st.warning("⚠️ **PROCESO DETENIDO**")
+            st.write("Aunque el monto sea alto, **NO hay delito aún**.")
+            st.info("Falta la Liquidación Oficial. Estás en etapa administrativa.")
             return
 
-        # CÁLCULO DE UMBRALES
+        # 2. CÁLCULO DE UMBRALES
         umbral_smlmv = 0
         norma = ""
-        
-        # LÓGICA 434A
+
+        # Lógica 434A
         if "434A" in tipo_delito:
             if 2017 <= anio <= 2019:
-                norma = "Ley 1819 de 2016"
                 umbral_smlmv = 7250
+                norma = "Ley 1819/16"
             elif 2020 <= anio <= 2022:
-                norma = "Ley 2010 de 2019"
                 umbral_smlmv = 5000
+                norma = "Ley 2010/19"
             elif anio >= 2023:
-                norma = "Ley 2277 de 2022"
                 umbral_smlmv = 1000
-                st.info("ℹ️ Nota: Desde 2023, NO se requiere sujeto activo calificado.")
+                norma = "Ley 2277/22"
 
-        # LÓGICA 434B
+        # Lógica 434B
         elif "434B" in tipo_delito:
             if anio < 2020:
-                st.error("⛔ **ATIPICIDAD:** El Art. 434B no era aplicable antes de 2020.")
+                st.error("El Art. 434B no aplicaba antes de 2020.")
                 return
             elif 2020 <= anio <= 2022:
-                norma = "Ley 2010 de 2019"
                 umbral_smlmv = 250
+                norma = "Ley 2010/19"
             elif anio >= 2023:
-                norma = "Ley 2277 de 2022"
                 umbral_smlmv = 100
+                norma = "Ley 2277/22"
 
-        # RESULTADOS MATEMÁTICOS
+        # Cálculos Finales
         valor_umbral_pesos = umbral_smlmv * smlmv_anio
         
-        st.subheader(f"📊 Resultados del Análisis ({anio})")
+        # TARJETAS DE RESULTADO (Metrics se ven genial en celular)
         col1, col2 = st.columns(2)
-        col1.metric("Tu Caso (Monto)", f"${monto_irregularidad:,.0f}")
-        col2.metric("Umbral Penal (Tope)", f"${valor_umbral_pesos:,.0f}", f"{umbral_smlmv} SMLMV")
+        col1.metric("Tu Caso", f"${monto_irregularidad:,.0f}")
+        col2.metric("Tope Penal", f"${valor_umbral_pesos:,.0f}", f"{umbral_smlmv} SMLMV")
+        
+        st.caption(f"Norma aplicada: {norma} (SMLMV ${smlmv_anio:,.0f})")
 
-        st.markdown(f"**Norma Aplicada:** {norma}")
-
+        # VEREDICTO FINAL
         if monto_irregularidad >= valor_umbral_pesos:
-            st.error("🚨 **RESULTADO: CONDUCTA TÍPICA (HAY DELITO)**")
-            st.markdown(f"El monto supera los **{umbral_smlmv} SMLMV** exigidos por la ley vigente en {anio}.")
-            st.markdown("⚠️ **Acción:** Se recomienda pago inmediato o defensa penal especializada.")
+            st.error("🚨 **HAY DELITO (CONDUCTA TÍPICA)**")
+            st.write("El monto supera el tope legal. Se recomienda abogado penalista.")
         else:
-            st.success("🟢 **RESULTADO: CONDUCTA ATÍPICA (NO ES DELITO)**")
-            diferencia = valor_umbral_pesos - monto_irregularidad
-            st.markdown(f"El monto NO alcanza la cuantía penal. Faltarían **${diferencia:,.0f}** para ser delito.")
+            st.success("🟢 **NO ES DELITO (ATÍPICO)**")
+            diff = valor_umbral_pesos - monto_irregularidad
+            st.write(f"Faltan **${diff:,.0f}** para que sea penal.")
 
 if __name__ == "__main__":
     app()
