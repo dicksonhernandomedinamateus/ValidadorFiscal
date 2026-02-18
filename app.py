@@ -62,7 +62,7 @@ def app():
 
     # --- FILTRO 2: PROCEDIBILIDAD (LIQUIDACIÓN OFICIAL) ---
     tiene_liquidacion = st.radio(
-        "¿Existe ya Liquidación Oficial de Revisión o Resolución Sanción?",
+        "¿Existe ya Liquidación Oficial de Autoridad Competente?",
         options=["SÍ", "NO"],
         horizontal=True,
         key="filtro_liquidacion"
@@ -158,4 +158,5 @@ def app():
 
 if __name__ == "__main__":
     app()
+
 
