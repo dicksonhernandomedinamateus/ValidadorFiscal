@@ -3,23 +3,23 @@ from datetime import date
 
 # --- CONFIGURACIÓN DE PÁGINA (Para que se vea bien en móviles) ---
 st.set_page_config(
-    page_title="Validador Penal",
+    page_title="Validador Delitos Fiscales",
     page_icon="⚖️",
     layout="centered" # Centrado se ve mejor en celular que "wide"
 )
 
 def app():
     # --- TÍTULO COMPACTO ---
-    st.title("⚖️ VALIDADOR FISCAL")
+    st.title("⚖️ VALIDADOR DELITOS FISCALES")
     st.markdown("**Omisión de Activos (434A) y Evasión (434B)**")
     
     # Créditos en un desplegable pequeño para no estorbar
     with st.expander("ℹ️ Créditos y Autoría"):
         st.markdown(
             """
-            * **Concepto Jurídico:** Dickson Hernando Medina Mateus
-            * **Tecnología:** Gemini AI
-            * **Base Legal:** Leyes 1819, 2010 y 2277.
+            * **Programador:** Dickson Hernando Medina Mateus
+            * **Jefe:** Jorge Iván Rodríguez
+            
             """
         )
 
@@ -133,3 +133,4 @@ def app():
 
 if __name__ == "__main__":
     app()
+
