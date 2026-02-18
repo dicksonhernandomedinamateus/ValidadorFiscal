@@ -22,7 +22,7 @@ def app():
             """
         )
 
-  # --- BASE DE DATOS SMLMV ---
+ # --- BASE DE DATOS SMLMV ---
     smlmv_db = {
         2017: 737717, 2018: 781242, 2019: 828116, 2020: 877803,
         2021: 908526, 2022: 1000000, 2023: 1160000, 2024: 1300000,
@@ -57,20 +57,21 @@ def app():
             key="filtro_contribuyente"
         )
         if es_contribuyente == "NO":
-            st.warning("⛔ **STOP:** No hay delito, Para esta fecha la ley exigía ser Contribuyente.")
+            st.warning("⛔ **STOP:** No hay delito, para esta fecha la ley exigía ser Contribuyente.")
             return # DETIENE LA EJECUCIÓN AQUÍ
 
     # --- FILTRO 2: PROCEDIBILIDAD (LIQUIDACIÓN OFICIAL) ---
+    # AJUSTE: Incluimos "Aforo" para cubrir a los omisos
     tiene_liquidacion = st.radio(
-        "¿Existe ya Liquidación Oficial de Autoridad Competente?",
+        "¿Existe Liquidación Oficial de Autoridad Competente?",
         options=["SÍ", "NO"],
         horizontal=True,
         key="filtro_liquidacion"
     )
     
     if tiene_liquidacion == "NO":
-        st.warning("⛔ **STOP:** No hay delito")
-        st.info("Sin Liquidación Oficial, el caso está en etapa administrativa.")
+        st.warning("⛔ **STOP:** No hay delito.")
+        st.info("Sin Liquidación Oficial estamos en etapa administrativa.")
         return # DETIENE LA EJECUCIÓN AQUÍ
 
     # ---------------------------------------------------------
@@ -102,13 +103,21 @@ def app():
         if anio < 2020:
             st.error("⛔ **ATIPICIDAD:** El Art. 434B no era aplicable antes de 2020.")
             return
-        lista_verbos = ["Omitir ingresos", "Incluir costos/gastos inexistentes", "Créditos fiscales improcedentes"]
+        
+        # AJUSTE: Agregamos "Omitir presentar declaración"
+        lista_verbos = [
+            "Omitir presentar declaración tributaria", # <--- NUEVO VERBO
+            "Omitir ingresos", 
+            "Incluir costos/gastos inexistentes", 
+            "Reclamar créditos fiscales improcedentes"
+        ]
         verbo_seleccionado = st.selectbox("Conducta específica:", lista_verbos)
 
     # 4. VALOR
     monto_irregularidad = st.number_input(
-        "💰 Valor de la irregularidad (Pesos COP):",
-        min_value=0.0, format="%.0f"
+        "💰 Valor del impuesto a cargo / sanción (Pesos COP):",
+        min_value=0.0, format="%.0f",
+        help="En caso de omisión, usa el valor determinado en la Liquidación de Aforo."
     )
 
     # --- BOTÓN DE ANÁLISIS ---
@@ -149,15 +158,12 @@ def app():
         st.caption(f"Norma: {norma} | SMLMV Año {anio}: ${smlmv_anio:,.0f}")
 
         if monto_irregularidad >= valor_umbral_pesos:
-            st.error("🚨 **HAY DELITO **")
+            st.error("🚨 **HAY DELITO (CONDUCTA TÍPICA)**")
             st.write(f"El monto supera el tope penal vigente en {anio}.")
         else:
-            st.success("🟢 **NO ES DELITO **")
+            st.success("🟢 **NO ES DELITO**")
             diff = valor_umbral_pesos - monto_irregularidad
             st.write(f"Faltan ${diff:,.0f} para alcanzar el umbral penal.")
 
 if __name__ == "__main__":
     app()
-
-
-
