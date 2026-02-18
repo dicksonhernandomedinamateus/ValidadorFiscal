@@ -13,7 +13,7 @@ def app():
     st.title("⚖️ VALIDADOR PENAL")
     st.markdown("**Omisión de Activos (434A) y Evasión (434B)**")
     
-    with st.expander("ℹ️ Créditos y Autoría"):
+    with st.expander("ℹ️ Créditos"):
         st.markdown(
             """
             * **Programador:** Dickson Hernando Medina Mateus
@@ -158,5 +158,6 @@ def app():
 
 if __name__ == "__main__":
     app()
+
 
 
