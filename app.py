@@ -10,15 +10,15 @@ st.set_page_config(
 
 def app():
     # --- TÍTULO Y CRÉDITOS ---
-    st.title("⚖️ VALIDADOR FISCAL")
+    st.title("⚖️ VALIDADOR DELITOS FISCALES")
     st.markdown("**Omisión de Activos (434A) y Evasión (434B)**")
     
     with st.expander("ℹ️ Créditos y Autoría"):
         st.markdown(
             """
-            * **Concepto Jurídico:** Dickson Hernando Medina Mateus
-            * **Tecnología:** Gemini AI
-            * **Base Legal:** Leyes 1819 (2016), 2010 (2019) y 2277 (2022).
+            * **Programador:** Dickson Hernando Medina Mateus
+            * **Jefe:** Jorge Iván Rodríguez
+           
             """
         )
 
@@ -179,4 +179,5 @@ def app():
 
 if __name__ == "__main__":
     app()
+
 
