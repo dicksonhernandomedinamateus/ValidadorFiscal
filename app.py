@@ -10,14 +10,14 @@ st.set_page_config(
 
 def app():
     # --- TÍTULO Y CRÉDITOS ---
-    st.title("⚖️ VALIDADOR DELITOS FISCALES")
+    st.title("⚖️ VALIDADOR PENAL")
     st.markdown("**Omisión de Activos (434A) y Evasión (434B)**")
     
     with st.expander("ℹ️ Créditos y Autoría"):
         st.markdown(
             """
             * **Programador:** Dickson Hernando Medina Mateus
-            * **Jefe:** Jorge Iván Rodríguez
+            * **Jefe:**        Jorge Iván Rodríguez
            
             """
         )
@@ -57,7 +57,7 @@ def app():
             key="filtro_contribuyente"
         )
         if es_contribuyente == "NO":
-            st.warning("⛔ **STOP:** No hay delito. Para esta fecha la ley exigía ser Contribuyente.")
+            st.warning("⛔ **STOP:** No hay delito, Para esta fecha la ley exigía ser Contribuyente.")
             return # DETIENE LA EJECUCIÓN AQUÍ
 
     # --- FILTRO 2: PROCEDIBILIDAD (LIQUIDACIÓN OFICIAL) ---
@@ -69,8 +69,8 @@ def app():
     )
     
     if tiene_liquidacion == "NO":
-        st.warning("⛔ **STOP:** No hay delito procesalmente.")
-        st.info("Sin Liquidación Oficial, el caso está en etapa administrativa. No pierdas tiempo analizando penalmente.")
+        st.warning("⛔ **STOP:** No hay delito")
+        st.info("Sin Liquidación Oficial, el caso está en etapa administrativa.")
         return # DETIENE LA EJECUCIÓN AQUÍ
 
     # ---------------------------------------------------------
@@ -149,7 +149,7 @@ def app():
         st.caption(f"Norma: {norma} | SMLMV Año {anio}: ${smlmv_anio:,.0f}")
 
         if monto_irregularidad >= valor_umbral_pesos:
-            st.error("🚨 **HAY DELITO (CONDUCTA TÍPICA)**")
+            st.error("🚨 **HAY DELITO **")
             st.write(f"El monto supera el tope penal vigente en {anio}.")
         else:
             st.success("🟢 **NO ES DELITO **")
@@ -158,3 +158,4 @@ def app():
 
 if __name__ == "__main__":
     app()
+
